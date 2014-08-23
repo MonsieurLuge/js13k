@@ -9,6 +9,10 @@ var canvas = document.getElementById("js13k");
 var context = canvas.getContext('2d');
 var frameRate = 1000/60;
 
+/**
+ * The player
+ * TODO : Start to work on it
+ */
 var seeker = {
     id: 'seeker',
     x: 4,
@@ -21,17 +25,29 @@ var seeker = {
     }
 };
 
+/**
+ * A cave
+ * TODO : Make it generic
+ */
 var cave = {
     seed: 92,
     width: 30,
     height: 60,
     map: [],
+    exits: [],
+    /**
+     * The cave generator settings
+     * TODO: Create a generator.json file
+     */
     generator: {
         chanceToStartAlive: 0.38,
         loops: 3,
         cellsToDie: 5,
         cellsToLive: 4
     },
+    /**
+     * Clears the cave content
+     */
     clear: function() {
         Math.seed = this.seed;
 
@@ -42,7 +58,9 @@ var cave = {
 
         return this;
     },
-    exits: [],
+    /**
+     * Fill the cave with random things
+     */
     fill: function() {
         for (var i = 0; i < this.width; i++) {
             this.map[i] = [];
@@ -59,6 +77,9 @@ var cave = {
 
         return this;
     },
+    /**
+     * Create some exits to the cave
+     */
     carveExits: function(exitLength) {
         var exitCarved = false,
             xPosition = Math.round(Math.seededRandom(0, 1)) * (this.width - 1),
@@ -107,6 +128,9 @@ var cave = {
             this.carveExits(1);
         }
     },
+    /**
+     * Generates the cave content
+     */
     generate: function(stepByStep) {
         for (var generation = 1; generation <= this.generator.loops; generation++) {
             var clonedMap = this.map.slice(0);
@@ -134,6 +158,10 @@ var cave = {
 
         return this;
     },
+    /**
+     * Draw the cave
+     * TODO: use a generic method
+     */
     draw: function() {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
