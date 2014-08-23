@@ -93,6 +93,7 @@ function neighbourCells(data, cellX, cellY) {
  * TODO setSeed description
  *
  * @param {integer} seed
+ * @return {integer} seed
  */
 function setSeed(seed) {
     if (seed === parseInt(seed)) {
@@ -100,4 +101,6 @@ function setSeed(seed) {
     } else {
         Math.seed = Math.round(Math.random() * 32000);
     }
+
+    return Math.seed;
 }
