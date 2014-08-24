@@ -3,16 +3,17 @@
  *
  * @return {Cave}
  */
-function Cave() {
+function Cave(caveId) {
     // Some parameters
     this.width = null;
     this.height = null;
+    this.id = caveId;
     this.map = [];
     this.entrances = [];
 
-    // Generator settings
+    // Cave generator settings
     // TODO move this to a json setting file
-    this.generator = {
+    this.caveGenerator = {
         chanceToStartAlive: 0.38,
         loops: 3,
         cellsToDie: 5,
@@ -27,15 +28,64 @@ function Cave() {
 }
 
 /**
- * TODO carveEntrance description
+ * Try to carve an entrance
+ *
+ * @param  {integer} x
+ * @param  {integer} y
+ * @param  {object} direction
+ * @param  {integer} tries
+ * @return {boolean}
  */
-Cave.prototype.carveEntrance = function(x, y, direction) {
-    console.log('Try to carve an entrance at ' + x + ',' + y + ' from ' + direction.from); // TODO remove
+Cave.prototype.carveEntrance = function(x, y, direction, tries) {
+    tries++;
 
-    // If there is already an entrance, change coordinates
+    console.log('Try to carve an entrance at ' + x + ',' + y + ' from ' + direction.from + ' (tries = ' + tries + ')'); // TODO remove
+
+    // If there is already an entrance, change the coordinates
     if (this.entranceExists(x, y, direction.direction).length > 0) {
+        // if the maximum of authorized tries are reached, stop the loop
+        if (tries >= (this.width + this.length) / 4.5) {
+            return false;
+        }
 
+        // Continue to try to carve an entrance
+        var nextCoordinates = this.nextEntranceCoordinates(x, y, direction);
+
+        return this.carveEntrance(nextCoordinates.x, nextCoordinates.y, nextCoordinates.direction, tries);
     }
+
+    // Try to carve the entrance
+    for (searchingLength = 1; searchingLength < 4; searchingLength++) {
+        if (direction.x === null) {
+            var searchX = (x * 9 + 4);
+            var searchY = (y * 9 + 4) + direction.y * (4 - searchingLength);
+        } else {
+            var searchX = (x * 9 + 4) + direction.x * (4 - searchingLength);
+            var searchY = (y * 9 + 4);
+        }
+
+        // If we found a hole, carve the entrance
+        if (this.map[searchX][searchY] === false) {
+            for (var carving = 0; carving < searchingLength; carving++) {
+                if (direction.x === null) {
+                    var carveX = (x * 9 + 4);
+                    var carveY = (y * 9 + 4) + direction.y * (4 - carving);
+                } else {
+                    var carveX = (x * 9 + 4) + direction.x * (4 - carving);
+                    var carveY = (y * 9 + 4);
+                }
+
+                this.map[carveX][carveY] = false;
+            }
+
+            // Store the entrance position
+            this.entrances.push({x: x, y: y, direction: direction});
+
+            return true;
+        }
+    }
+
+    return false;
 };
 
 /**
@@ -60,45 +110,8 @@ Cave.prototype.carveEntrances = function() {
         y = Math.round(Math.seededRandom(0, this.height / 9 - 1));
     }
 
-    this.carveEntrance(x, y, direction);
-
-    do {
-        for (var searching = 1; searching <= exitLength; searching++) {
-            if (this.map[xPosition + searching * direction][yPosition] === false) {
-                console.log('carving a ' + searching + 'px exit at x=' + xPosition + ' and y=' + yPosition); // TODO remove
-
-                for (var carving = 0; carving < searching; carving++) {
-                    this.map[xPosition + carving * direction][yPosition] = false;
-                }
-
-                exitCarved = true;
-
-                this.exits[this.exits.length] = {
-                    x: xPosition,
-                    y: yPosition
-                };
-
-                break;
-            }
-        }
-
-        yPosition++;
-        tries++;
-
-        if (yPosition >= this.height) {
-            yPosition = 0;
-        }
-    } while (exitCarved === false && yPosition !== yStart && tries <= this.height);
-
-    // If no exit was carved, try with a bigger tunnel
-    if (exitCarved === false && exitLength < 5) {
-        this.carveExits(++exitLength);
-    }
-
-    // Add a new exit ?
-    if (exitCarved === true && Math.seededRandom(0, 1) < (1 / this.exits.length)) {
-        this.carveExits(1);
-    }
+    // Try to carve an entrance
+    this.carveEntrance(x, y, direction, 0);
 }
 
 /**
@@ -124,7 +137,15 @@ Cave.prototype.draw = function(context) {
     return this;
 }
 
-Cave.prototype.entranceExists(x, y, direction) {
+/**
+ * Tells if an entrance already exists
+ *
+ * @param  {integer} x
+ * @param  {integer} y
+ * @param  {object} direction
+ * @return {boolean}
+ */
+Cave.prototype.entranceExists = function(x, y, direction) {
     var entrances = this.getEntrances(x, y);
 
     if (entrances.length === 0) {
@@ -155,7 +176,7 @@ Cave.prototype.fill = function() {
                 this.map[i][j] = true;
             } else {
                 // Or create random content
-                this.map[i][j] = (Math.seededRandom(0, 1) < this.generator.chanceToStartAlive);
+                this.map[i][j] = (Math.seededRandom(0, 1) < this.caveGenerator.chanceToStartAlive);
             }
         }
     }
@@ -169,7 +190,7 @@ Cave.prototype.fill = function() {
  * @return {Cave}
  */
 Cave.prototype.generate = function() {
-    for (var generation = 1; generation <= this.generator.loops; generation++) {
+    for (var generation = 1; generation <= this.caveGenerator.loops; generation++) {
         var clonedMap = this.map.slice(0);
 
         for (var i = 0; i < this.width; i++) {
@@ -177,11 +198,11 @@ Cave.prototype.generate = function() {
                 var neighbours = neighbourCells(clonedMap, i, j);
 
                 if (clonedMap[i][j] === true) {
-                    if (neighbours.deadCells > this.generator.cellsToDie) {
+                    if (neighbours.deadCells > this.caveGenerator.cellsToDie) {
                         this.map[i][j] = false;
                     }
                 } else {
-                    if (neighbours.aliveCells > this.generator.cellsToLive) {
+                    if (neighbours.aliveCells > this.caveGenerator.cellsToLive) {
                         this.map[i][j] = true;
                     }
                 }
@@ -220,7 +241,6 @@ Cave.prototype.init = function() {
     // Set the size of the Cave
     this.width = Math.round(Math.seededRandom(1,4)) * 9 + 9;
     this.height = Math.round(Math.seededRandom(1,4)) * 9 + 9;
-    window.document.getElementById('cave-infos').innerHTML = 'width=' + this.width + ' height=' + this.height; // TODO remove
 
     // Clear some parameters
     this.map = [];
@@ -233,7 +253,7 @@ Cave.prototype.init = function() {
     this.generate();
 
     // And carve some exits
-    //this.carveExits(1);
+    //this.carveEntrances();
 
     // Finally, return the object
     return this;
