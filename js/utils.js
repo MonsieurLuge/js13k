@@ -31,20 +31,22 @@ function clearScreen() {
  * @return {nothing}
  */
 function drawGrid() {
+    var roomSize = 10;
+
     context.strokeStyle = "#414141";
     context.lineWidth = 2;
 
-    for (var i = 0; i < canvas.width / 72; i++) {
+    for (var i = 0; i < canvas.width / 8 * roomSize; i++) {
         context.beginPath();
-        context.moveTo(72 * i, 0);
-        context.lineTo(72 * i, canvas.height);
+        context.moveTo(8 * roomSize * i, 0);
+        context.lineTo(8 * roomSize * i, canvas.height);
         context.stroke();
     }
 
-    for (var j = 0; j < canvas.height / 72; j++) {
+    for (var j = 0; j < canvas.height / 8 * roomSize; j++) {
         context.beginPath();
-        context.moveTo(0, 72 * j);
-        context.lineTo(canvas.width, 72 * j);
+        context.moveTo(0, 8 * roomSize * j);
+        context.lineTo(canvas.width, 8 * roomSize * j);
         context.stroke();
     }
 }

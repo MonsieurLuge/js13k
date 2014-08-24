@@ -51,4 +51,4 @@ function startGame(seed) {
 }
 
 // START THE GAME !
-window.onload = startGame(2014);
+window.onload = startGame(66);

@@ -7,12 +7,12 @@ function Cave(caveId) {
     // Some parameters
     this.width = null;
     this.height = null;
+    this.roomSize = null;
     this.id = caveId;
     this.map = [];
     this.entrances = [];
 
     // Cave generator settings
-    // TODO move this to a json setting file
     this.caveGenerator = {
         chanceToStartAlive: 0.38,
         loops: 3,
@@ -25,6 +25,26 @@ function Cave(caveId) {
 
     // And return the object
     return this;
+}
+
+/**
+ * [addEntrance description]
+ * @param {[type]} x         [description]
+ * @param {[type]} y         [description]
+ * @param {[type]} direction [description]
+ */
+Cave.prototype.addEntrance = function(x, y, directionId) {
+    var direction = getDirection(directionId);
+
+    for (var length = 0; length < 4; length++) {
+        if (direction.x === null) {
+            this.map[this.roomSize * x + 4][this.roomSize * y + length] = false;
+            this.map[this.roomSize * x + 5][this.roomSize * y + length] = false;
+        } else {
+            this.map[this.roomSize * x + length][this.roomSize * y + 4] = false;
+            this.map[this.roomSize * x + length][this.roomSize * y + 5] = false;
+        }
+    }
 }
 
 /**
@@ -102,12 +122,12 @@ Cave.prototype.carveEntrances = function() {
     // Entrance position and direction
     if (direction.x === null) {
         // From top or bottom
-        x = Math.round(Math.seededRandom(0, this.width / 9 - 1));
+        x = Math.round(Math.seededRandom(0, this.width / this.roomSize - 1));
         y = this.height * direction.y;
     } else {
         // From right or left
         x = this.width * direction.x;
-        y = Math.round(Math.seededRandom(0, this.height / 9 - 1));
+        y = Math.round(Math.seededRandom(0, this.height / this.roomSize - 1));
     }
 
     // Try to carve an entrance
@@ -239,8 +259,9 @@ Cave.prototype.getEntrances = function(x, y) {
  */
 Cave.prototype.init = function() {
     // Set the size of the Cave
-    this.width = Math.round(Math.seededRandom(1,4)) * 9 + 9;
-    this.height = Math.round(Math.seededRandom(1,4)) * 9 + 9;
+    this.roomSize = 10;
+    this.width = Math.round(Math.seededRandom(1,4)) * this.roomSize;
+    this.height = Math.round(Math.seededRandom(1,4)) * this.roomSize;
 
     // Clear some parameters
     this.map = [];
@@ -248,6 +269,10 @@ Cave.prototype.init = function() {
 
     // Fill the cave with random data
     this.fill();
+
+    // TODO remove
+    this.addEntrance(1, 0, 1);
+    this.addEntrance(0, 0, 4);
 
     // Generate the cave
     this.generate();
