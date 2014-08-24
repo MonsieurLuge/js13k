@@ -30,7 +30,7 @@ function gameLoop() {
 function startGame(seed) {
     // Set the seed for this game
     seed = setSeed(seed);
-    window.document.getElementById('game-seed').innerHTML = seed;
+    window.document.getElementById('game-seed').innerHTML = seed; // TODO remove
 
     // For test purpose
     clearScreen();

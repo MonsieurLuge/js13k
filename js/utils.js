@@ -31,20 +31,51 @@ function clearScreen() {
  * @return {nothing}
  */
 function drawGrid() {
-    for (var i = 0; i < canvas.width / 64; i++) {
+    context.strokeStyle = "#414141";
+    context.lineWidth = 2;
+
+    for (var i = 0; i < canvas.width / 72; i++) {
         context.beginPath();
-        context.strokeStyle = "#353535";
-        context.moveTo(64 * i, 0);
-        context.lineTo(64 * i, canvas.height);
+        context.moveTo(72 * i, 0);
+        context.lineTo(72 * i, canvas.height);
         context.stroke();
     }
 
-    for (var j = 0; j < canvas.height / 64; j++) {
+    for (var j = 0; j < canvas.height / 72; j++) {
         context.beginPath();
-        context.strokeStyle = "#353535";
-        context.moveTo(0, 64 * j);
-        context.lineTo(canvas.width, 64 * j);
+        context.moveTo(0, 72 * j);
+        context.lineTo(canvas.width, 72 * j);
         context.stroke();
+    }
+}
+
+/**
+ * TODO getDirection description
+ *
+ * @param  {integer} directionId
+ * @return {object}
+ */
+function getDirection(directionId) {
+    switch (directionId) {
+        // top
+        case 1:
+            return {x: null, y: 0, direction: 1, from: 'top'};
+            break;
+        // right
+        case 2:
+            return {x: 1, y: null, direction: 2, from: 'right'};
+            break;
+        // bottom
+        case 3:
+            return {x: null, y: 1, direction: 3, from: 'bottom'};
+            break;
+        // left
+        case 4:
+            return {x: 0, y: null, direction: 4, from: 'left'};
+            break;
+        // nowhere
+        default:
+            return {x: null, y: null, from: 'nowhere'};
     }
 }
 

@@ -8,7 +8,7 @@ function Cave() {
     this.width = null;
     this.height = null;
     this.map = [];
-    this.exits = [];
+    this.entrances = [];
 
     // Generator settings
     // TODO move this to a json setting file
@@ -27,20 +27,40 @@ function Cave() {
 }
 
 /**
- * TODO carveExits description
+ * TODO carveEntrance description
+ */
+Cave.prototype.carveEntrance = function(x, y, direction) {
+    console.log('Try to carve an entrance at ' + x + ',' + y + ' from ' + direction.from); // TODO remove
+
+    // If there is already an entrance, change coordinates
+    if (this.entranceExists(x, y, direction.direction).length > 0) {
+
+    }
+};
+
+/**
+ * TODO carveEntrances description
  *
- * @param  {integer} exitLength
  * @return {nothing}
  */
-Cave.prototype.carveExits = function(exitLength) {
-    var exitCarved = false,
-        xPosition = Math.round(Math.seededRandom(0, 1)) * (this.width - 1),
-        yPosition = Math.round(Math.seededRandom(0, 1) * (this.height - 1)),
-        direction = xPosition === 0 ? 1 : -1,
-        yStart = yPosition,
+Cave.prototype.carveEntrances = function() {
+    var direction = getDirection(Math.round(Math.seededRandom(1, 4))),
+        x = 0,
+        y = 0,
         tries = 0;
 
-    console.log('Try to carve a ' + exitLength + 'px exit'); // TODO remove
+    // Entrance position and direction
+    if (direction.x === null) {
+        // From top or bottom
+        x = Math.round(Math.seededRandom(0, this.width / 9 - 1));
+        y = this.height * direction.y;
+    } else {
+        // From right or left
+        x = this.width * direction.x;
+        y = Math.round(Math.seededRandom(0, this.height / 9 - 1));
+    }
+
+    this.carveEntrance(x, y, direction);
 
     do {
         for (var searching = 1; searching <= exitLength; searching++) {
@@ -95,13 +115,29 @@ Cave.prototype.draw = function(context) {
             }
 
             context.beginPath();
-            context.fillStyle = "darkgrey";
+            context.fillStyle = "#bcbcbc";
             context.rect(8 * i, 8 * j, 8, 8);
             context.fill();
         }
     }
 
     return this;
+}
+
+Cave.prototype.entranceExists(x, y, direction) {
+    var entrances = this.getEntrances(x, y);
+
+    if (entrances.length === 0) {
+        return false;
+    }
+
+    for (entrance = 0; entrance < entrances.length; entrance++) {
+        if (entrances[entrance].direction === direction) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -157,14 +193,34 @@ Cave.prototype.generate = function() {
 }
 
 /**
+ * Returns the entrances at these coordinates
+ *
+ * @param  {integer} x
+ * @param  {integer} y
+ * @return {array} [{x, y, direction}, ...]
+ */
+Cave.prototype.getEntrances = function(x, y) {
+    var entrances = [];
+
+    for (var entrance = 0; entrance < this.entrances.length; entrance++) {
+        if (this.entrances[entrance].x === x && this.entrances[entrance].y === y) {
+            entrances.push({x: x, y: y, direction: this.entrances[entrance].direction});
+        }
+    }
+
+    return entrances;
+}
+
+/**
  * TODO init description
  *
  * @return {Cave}
  */
 Cave.prototype.init = function() {
     // Set the size of the Cave
-    this.width = Math.round(Math.seededRandom(1,4)) * 8 + 8;
-    this.height = Math.round(Math.seededRandom(1,4)) * 8 + 8;
+    this.width = Math.round(Math.seededRandom(1,4)) * 9 + 9;
+    this.height = Math.round(Math.seededRandom(1,4)) * 9 + 9;
+    window.document.getElementById('cave-infos').innerHTML = 'width=' + this.width + ' height=' + this.height; // TODO remove
 
     // Clear some parameters
     this.map = [];
@@ -177,7 +233,7 @@ Cave.prototype.init = function() {
     this.generate();
 
     // And carve some exits
-    this.carveExits(1);
+    //this.carveExits(1);
 
     // Finally, return the object
     return this;

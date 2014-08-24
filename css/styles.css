@@ -9,3 +9,13 @@ canvas {
     background-color: #303030;
     box-shadow: 0 0 10px #222;
 }
+
+#game-infos {
+    position: absolute;
+    width: 800px;
+    top: 30px;
+    left: calc(50% - 400px);
+    line-height: 20px;
+    font-size: 12px;
+    margin: 0;
+}
