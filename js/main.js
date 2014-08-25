@@ -8,8 +8,8 @@
 var canvas = document.getElementById("js13k-2014");
 var context = canvas.getContext('2d');
 var frameRate = 1000/60;
-var seed = '-';
-var caves = [];
+var seed = null;
+var world = null;
 
 /**
  * TODO gameLoop description
@@ -37,14 +37,14 @@ function startGame(seed) {
     clearScreen();
     drawGrid();
 
+    // Create the world
+    world = new World();
+
     // Create a cave
-    caves[0] = new Cave(caves.length);
+    //world.explore();
 
-    // Draw the cave
-    caves[0].draw(context);
-
-    // TODO remove
-    window.document.getElementById('cave-infos').innerHTML = 'width=' + caves[0].width + ' height=' + caves[0].height;
+    // Draw the world
+    world.draw();
 
     // TODO
     //gameLoop();

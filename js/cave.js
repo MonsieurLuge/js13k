@@ -3,14 +3,13 @@
  *
  * @return {Cave}
  */
-function Cave(caveId) {
-    // Some parameters
+function Cave(parameters) {
     this.width = null;
     this.height = null;
-    this.roomSize = null;
-    this.id = caveId;
+    this.type = null;
+    this.id = null;
     this.map = [];
-    this.entrances = [];
+    this.exits = [];
 
     // Cave generator settings
     this.caveGenerator = {
@@ -21,165 +20,44 @@ function Cave(caveId) {
     };
 
     // Init the Cave
-    this.init();
+    this.init(parameters);
 
     // And return the object
     return this;
 }
 
 /**
- * [addEntrance description]
- * @param {[type]} x         [description]
- * @param {[type]} y         [description]
- * @param {[type]} direction [description]
+ * TODO addExit description
+ * @param {Object} parameters
  */
-Cave.prototype.addEntrance = function(x, y, directionId) {
-    var direction = getDirection(directionId);
+Cave.prototype.addExit = function(parameters) {
+    var direction = getDirection(parameters.direction);
+    var xStart = 0;
+    var yStart = 0;
 
-    for (var length = 0; length < 4; length++) {
-        if (direction.x === null) {
-            this.map[this.roomSize * x + 4][this.roomSize * y + length] = false;
-            this.map[this.roomSize * x + 5][this.roomSize * y + length] = false;
-        } else {
-            this.map[this.roomSize * x + length][this.roomSize * y + 4] = false;
-            this.map[this.roomSize * x + length][this.roomSize * y + 5] = false;
-        }
-    }
-}
-
-/**
- * Try to carve an entrance
- *
- * @param  {integer} x
- * @param  {integer} y
- * @param  {object} direction
- * @param  {integer} tries
- * @return {boolean}
- */
-Cave.prototype.carveEntrance = function(x, y, direction, tries) {
-    tries++;
-
-    console.log('Try to carve an entrance at ' + x + ',' + y + ' from ' + direction.from + ' (tries = ' + tries + ')'); // TODO remove
-
-    // If there is already an entrance, change the coordinates
-    if (this.entranceExists(x, y, direction.direction).length > 0) {
-        // if the maximum of authorized tries are reached, stop the loop
-        if (tries >= (this.width + this.length) / 4.5) {
-            return false;
-        }
-
-        // Continue to try to carve an entrance
-        var nextCoordinates = this.nextEntranceCoordinates(x, y, direction);
-
-        return this.carveEntrance(nextCoordinates.x, nextCoordinates.y, nextCoordinates.direction, tries);
-    }
-
-    // Try to carve the entrance
-    for (searchingLength = 1; searchingLength < 4; searchingLength++) {
-        if (direction.x === null) {
-            var searchX = (x * 9 + 4);
-            var searchY = (y * 9 + 4) + direction.y * (4 - searchingLength);
-        } else {
-            var searchX = (x * 9 + 4) + direction.x * (4 - searchingLength);
-            var searchY = (y * 9 + 4);
-        }
-
-        // If we found a hole, carve the entrance
-        if (this.map[searchX][searchY] === false) {
-            for (var carving = 0; carving < searchingLength; carving++) {
-                if (direction.x === null) {
-                    var carveX = (x * 9 + 4);
-                    var carveY = (y * 9 + 4) + direction.y * (4 - carving);
-                } else {
-                    var carveX = (x * 9 + 4) + direction.x * (4 - carving);
-                    var carveY = (y * 9 + 4);
-                }
-
-                this.map[carveX][carveY] = false;
-            }
-
-            // Store the entrance position
-            this.entrances.push({x: x, y: y, direction: direction});
-
-            return true;
-        }
-    }
-
-    return false;
-};
-
-/**
- * TODO carveEntrances description
- *
- * @return {nothing}
- */
-Cave.prototype.carveEntrances = function() {
-    var direction = getDirection(Math.round(Math.seededRandom(1, 4))),
-        x = 0,
-        y = 0,
-        tries = 0;
-
-    // Entrance position and direction
-    if (direction.x === null) {
-        // From top or bottom
-        x = Math.round(Math.seededRandom(0, this.width / this.roomSize - 1));
-        y = this.height * direction.y;
+    if (direction.x === 0) {
+        xStart = parameters.x * 10 + 4;
+        yStart = parameters.y * 10 + 9 * (direction.y + 1) / 2;
     } else {
-        // From right or left
-        x = this.width * direction.x;
-        y = Math.round(Math.seededRandom(0, this.height / this.roomSize - 1));
+        xStart = parameters.x * 10 + 9 * (direction.x + 1) / 2;
+        yStart = parameters.y * 10 + 4;
     }
 
-    // Try to carve an entrance
-    this.carveEntrance(x, y, direction, 0);
-}
-
-/**
- * TODO draw description
- *
- * @param  {context} context
- * @return {Cave}
- */
-Cave.prototype.draw = function(context) {
-    for (var i = 0; i < this.width; i++) {
-        for (var j = 0; j < this.height; j++) {
-            if (this.map[i][j] === false) {
-                continue;
-            }
-
-            context.beginPath();
-            context.fillStyle = "#bcbcbc";
-            context.rect(8 * i, 8 * j, 8, 8);
-            context.fill();
+    for (var length = 0; length < Math.ceil(10 / 2); length++) {
+        if (direction.x === 0) {
+            // Carve to top or bottom
+            this.map[xStart][yStart - length * direction.y] = false;
+            this.map[xStart + 1][yStart - length * direction.y] = false;
+        } else {
+            // Carve to left or right
+            this.map[xStart - length * direction.x][yStart] = false;
+            this.map[xStart - length * direction.x][yStart + 1] = false;
         }
     }
 
-    return this;
-}
-
-/**
- * Tells if an entrance already exists
- *
- * @param  {integer} x
- * @param  {integer} y
- * @param  {object} direction
- * @return {boolean}
- */
-Cave.prototype.entranceExists = function(x, y, direction) {
-    var entrances = this.getEntrances(x, y);
-
-    if (entrances.length === 0) {
-        return false;
-    }
-
-    for (entrance = 0; entrance < entrances.length; entrance++) {
-        if (entrances[entrance].direction === direction) {
-            return true;
-        }
-    }
-
-    return false;
-}
+    // Store the exit informations
+    this.exits.push(parameters);
+};
 
 /**
  * TODO fill description
@@ -202,7 +80,7 @@ Cave.prototype.fill = function() {
     }
 
     return this;
-}
+};
 
 /**
  * TODO generate description
@@ -231,55 +109,54 @@ Cave.prototype.generate = function() {
     }
 
     return this;
-}
+};
 
 /**
- * Returns the entrances at these coordinates
+ * Returns the exits at these coordinates
  *
  * @param  {integer} x
  * @param  {integer} y
  * @return {array} [{x, y, direction}, ...]
  */
-Cave.prototype.getEntrances = function(x, y) {
-    var entrances = [];
+Cave.prototype.getExits = function(x, y) {
+    var exits = [];
 
-    for (var entrance = 0; entrance < this.entrances.length; entrance++) {
-        if (this.entrances[entrance].x === x && this.entrances[entrance].y === y) {
-            entrances.push({x: x, y: y, direction: this.entrances[entrance].direction});
+    for (var exit = 0; exit < this.exits.length; exit++) {
+        if (this.exits[exit].x === x && this.exits[exit].y === y) {
+            exits.push({x: x, y: y, direction: this.exits[exit].direction});
         }
     }
 
-    return entrances;
-}
+    return exits;
+};
 
 /**
  * TODO init description
  *
  * @return {Cave}
  */
-Cave.prototype.init = function() {
-    // Set the size of the Cave
-    this.roomSize = 10;
-    this.width = Math.round(Math.seededRandom(1,4)) * this.roomSize;
-    this.height = Math.round(Math.seededRandom(1,4)) * this.roomSize;
-
-    // Clear some parameters
+Cave.prototype.init = function(parameters) {
+    // Init some stuff
     this.map = [];
     this.exits = [];
+    this.caveId = parameters.id;
+    this.type = parameters.type;
+
+    // Set the size of the Cave
+    this.width = parameters.width * 10;
+    this.height = parameters.height * 10;
 
     // Fill the cave with random data
     this.fill();
 
-    // TODO remove
-    this.addEntrance(1, 0, 1);
-    this.addEntrance(0, 0, 4);
+    // Add the exits
+    for (var exitNb = 0; exitNb < parameters.exits.length; exitNb++) {
+        this.addExit(parameters.exits[exitNb]);
+    }
 
     // Generate the cave
     this.generate();
 
-    // And carve some exits
-    //this.carveEntrances();
-
     // Finally, return the object
     return this;
-}
+};

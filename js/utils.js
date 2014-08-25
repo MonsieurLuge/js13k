@@ -59,25 +59,20 @@ function drawGrid() {
  */
 function getDirection(directionId) {
     switch (directionId) {
-        // top
         case 1:
-            return {x: null, y: 0, direction: 1, from: 'top'};
-            break;
-        // right
+        case 'top':
+            return {x: 0, y: -1, direction: 1, to: 'top'};
         case 2:
-            return {x: 1, y: null, direction: 2, from: 'right'};
-            break;
-        // bottom
+        case 'right':
+            return {x: 1, y: 0, direction: 2, to: 'right'};
         case 3:
-            return {x: null, y: 1, direction: 3, from: 'bottom'};
-            break;
-        // left
+        case 'bottom':
+            return {x: 0, y: 1, direction: 3, to: 'bottom'};
         case 4:
-            return {x: 0, y: null, direction: 4, from: 'left'};
-            break;
-        // nowhere
+        case 'left':
+            return {x: -1, y: 0, direction: 4, to: 'left'};
         default:
-            return {x: null, y: null, from: 'nowhere'};
+            return {x: 0, y: 0, from: 'nowhere'};
     }
 }
 
