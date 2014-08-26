@@ -69,12 +69,24 @@ Cave.prototype.fill = function() {
         this.map[i] = [];
 
         for (var j = 0; j < this.height; j++) {
-            if (i === 0 || i === this.width - 1 || j === 0 || j === this.height - 1) {
-                // Draw a border
-                this.map[i][j] = true;
-            } else {
-                // Or create random content
-                this.map[i][j] = (Math.seededRandom(0, 1) < this.caveGenerator.chanceToStartAlive);
+            switch(this.type) {
+                case 'ground':
+                    if (j === this.height) {
+                        // Draw a border
+                        this.map[i][j] = true;
+                    } else {
+                        this.map[i][j] = (j >= this.height * 0.8) || (Math.seededRandom(0, 1) <= (this.caveGenerator.chanceToStartAlive * j / this.height));
+                    }
+
+                    break;
+                case 'underground':
+                    if (i === 0 || i === this.width - 1 || j === 0 || j === this.height - 1) {
+                        // Draw a border
+                        this.map[i][j] = true;
+                    } else {
+                        // Or create random content
+                        this.map[i][j] = (Math.seededRandom(0, 1) < this.caveGenerator.chanceToStartAlive);
+                    }
             }
         }
     }
