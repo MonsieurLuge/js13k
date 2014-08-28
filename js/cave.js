@@ -4,10 +4,12 @@
  * @return {Cave}
  */
 function Cave(parameters) {
+    this.id = null;
+    this.x = null;
+    this.y = null;
     this.width = null;
     this.height = null;
     this.type = null;
-    this.id = null;
     this.map = [];
     this.exits = [];
 
@@ -57,6 +59,21 @@ Cave.prototype.addExit = function(parameters) {
 
     // Store the exit informations
     this.exits.push(parameters);
+};
+
+/**
+ * Tells if an exit exits at these coordinates, to this direction
+ *
+ * @return {boolean}
+ */
+Cave.prototype.exitExists = function(x, y, direction) {
+    for (var exitNb = 0; exitNb < this.exits.length; exitNb++) {
+        if (this.exits[exitNb].x === x && this.exits[exitNb].y === y && this.exits[exitNb].direction === direction) {
+            return true;
+        }
+    }
+
+    return false;
 };
 
 /**
@@ -153,6 +170,10 @@ Cave.prototype.init = function(parameters) {
     this.exits = [];
     this.caveId = parameters.id;
     this.type = parameters.type;
+
+    // Position of the first room of the cave
+    this.x = parameters.x;
+    this.y = parameters.y;
 
     // Set the size of the Cave
     this.width = parameters.width * 10;

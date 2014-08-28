@@ -8,9 +8,44 @@ function World() {
     this.y = null;
     this.map = [];
     this.caves = [];
+    this.currentCave = null;
+    this.maxCaveWidth = 4;
+    this.maxCaveHeight = 4;
 
     this.init();
 }
+
+/**
+ * TODO caveExists description
+ * @return {boolean}
+ */
+World.prototype.caveExists = function(x, y) {
+    // If the coordinates are out of the map boundaries, return false
+    if (x < 0 || x > this.width || y < 0 || y > this.height) {
+        return false;
+    }
+
+    // If there is no data at these coordinates, return false
+    if (this.map[x] === undefined) {
+        return false;
+    }
+
+    if (this.map[x][y] === undefined) {
+        return false;
+    }
+
+    // If there is a cave Id at these coordinates, return true
+    return this.map[x][y] !== undefined;
+};
+
+/**
+ * TODO createCave description
+ */
+World.prototype.createCave = function(x, y) {
+    console.log('create a cave at ' + x + ',' + y);
+
+
+};
 
 /**
  * TODO draw description
@@ -35,8 +70,31 @@ World.prototype.draw = function() {
  * TODO explore description
  * @return {[type]} [description]
  */
-World.prototype.explore = function() {
+World.prototype.explore = function(x, y, direction) {
+    // If there is no exit in this map cell, return false
+    if (false === this.caves[this.currentCave].exitExists(x, y, direction)) {
+        return false;
+    }
 
+    // Is there is no cave in the next map cell, generate the cave
+    if (false === this.caveExists(x + getDirection(direction).x, y + getDirection(direction).y)) {
+        this.createCave(x + getDirection(direction).x, y + getDirection(direction).y);
+    }
+
+    // Then move to the next cave
+    // TODO
+};
+
+/**
+ * TODO getCaveId description
+ * @return {string}
+ */
+World.prototype.getCaveId = function(x, y) {
+    if (true === this.caveExists(x, y)) {
+        return  this.map[x][y].id;
+    }
+
+    return null;
 };
 
 /**
@@ -50,34 +108,44 @@ World.prototype.init = function() {
     // Init some things
     this.x = 0;
     this.y = 0;
-    this.width = 0;
-    this.height = 0;
+    this.width = 5;
+    this.height = 5;
+    this.map = [[]];
 
     // Create the starting room
+    var caveId = 0;
     this.caves[0] = new Cave({
-        id: 0,
+        id: caveId,
         type: 'underground',
-        width: 4,
-        height: 3,
+        x: 0,
+        y: 0,
+        width: 5,
+        height: 5,
         exits: [
             {
                 x: 0,
                 y: 0,
-                direction: 'top'
+                direction: 'top',
+                linked: true
             },
             {
-                x: 0,
-                y: 2,
-                direction: 'bottom'
+                x: 4,
+                y: 1,
+                direction: 'right'
             },
             {
                 x: 3,
-                y: 1,
-                direction: 'right'
+                y: 4,
+                direction: 'bottom',
+                linked: true
             }
         ]
     });
 
+    // Store the first cave id
+    this.map[0][0] = caveId;
+
+    // Then, store the current cave
     this.currentCave = 0;
 
 };
