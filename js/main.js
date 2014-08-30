@@ -38,7 +38,7 @@ function startGame(seed) {
     drawGrid();
 
     // Create the world
-    world = new World();
+    world = new World(seed);
 
     // Create a cave
     //world.explore();

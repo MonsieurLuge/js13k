@@ -10,6 +10,7 @@ function Cave(parameters) {
     this.width = null;
     this.height = null;
     this.type = null;
+    this.seed = null;
     this.map = [];
     this.exits = [];
 
@@ -59,6 +60,58 @@ Cave.prototype.addExit = function(parameters) {
 
     // Store the exit informations
     this.exits.push(parameters);
+};
+
+/**
+ * TODO clear description
+ * @return {[type]} [description]
+ */
+Cave.prototype.clear = function() {
+    this.map = [];
+    this.exits = [];
+};
+
+/**
+ * TODO createCave description
+ * @return {[type]} [description]
+ */
+Cave.prototype.createCave = function(tries, exits) {
+    if (tries >= 50) {
+        'Abandon de la génération.'
+
+        return null;
+    }
+
+    // Init the seed
+    setSeed(this.seed);
+    console.log('Création d\'une cave (seed = ' + this.seed + ').');
+
+    // Clear the map content
+    this.clear();
+
+    // Fill the cave with random data
+    this.fill();
+
+    // Add the exits
+    for (var exitNb = 0; exitNb < exits.length; exitNb++) {
+        this.addExit(exits[exitNb]);
+    }
+
+    // Generate the cave
+    this.generate();
+
+    // If the cave is not correctly generated, try again
+    if (false === this.isValid()) {
+        console.log('Fin de la vérification. La cave n\'est pas valide.');
+
+        tries++;
+        this.seed++;
+        this.createCave(tries, exits);
+    } else {
+        console.log('Fin de la vérification. La cave est valide.');
+    }
+
+    return this;
 };
 
 /**
@@ -166,12 +219,11 @@ Cave.prototype.getExits = function(x, y) {
  */
 Cave.prototype.init = function(parameters) {
     // Init some stuff
-    this.map = [];
-    this.exits = [];
     this.caveId = parameters.id;
     this.type = parameters.type;
+    this.seed = parameters.seed;
 
-    // Position of the first room of the cave
+    // Coordinates of the first room of the cave
     this.x = parameters.x;
     this.y = parameters.y;
 
@@ -179,17 +231,105 @@ Cave.prototype.init = function(parameters) {
     this.width = parameters.width * 10;
     this.height = parameters.height * 10;
 
-    // Fill the cave with random data
-    this.fill();
-
-    // Add the exits
-    for (var exitNb = 0; exitNb < parameters.exits.length; exitNb++) {
-        this.addExit(parameters.exits[exitNb]);
-    }
-
-    // Generate the cave
-    this.generate();
+    // Create the cave
+    this.createCave(1, parameters.exits);
 
     // Finally, return the object
     return this;
+};
+
+/**
+ * TODO isValid description
+ * @return {Boolean} [description]
+ */
+Cave.prototype.isValid = function() {
+    if (this.exits.length < 2) {
+        return true;
+    }
+
+    var clonedMap = this.map.slice(0);
+    var xStart = null;
+    var yStart = null;
+    var caveWidth = this.width;
+    var caveHeight = this.height;
+    var caveExits = this.exits.slice(0);
+    var exitsLinked = 1;
+    var exitsFound = []
+
+    var searchForExits = {
+        search: function(x, y) {
+            // If the coordinates are out of bound, stop
+            if (x < 0 || x >= caveWidth || y < 0 || y >= caveHeight) {
+                return;
+            }
+
+            // If the coordinates have been searched, or if there is a wall, stop
+            if (clonedMap[x][y] === 'searched' || clonedMap[x][y] === true) {
+                return;
+            }
+
+            // If a border is reached, get the exit informations
+            if (x === 0 || x === caveWidth - 1) {
+                // Left or right border
+                for (var nbExit = 1; nbExit < caveExits.length; nbExit++) {
+                    if (caveExits[nbExit].y === Math.floor(y / 10) && (caveExits[nbExit].direction === 'left' || caveExits[nbExit].direction === 'right') && exitsFound.indexOf(nbExit) === -1) {
+                        exitsFound.push(nbExit);
+
+                        if (true === caveExits[nbExit].linked) {
+                            exitsLinked++;
+                        }
+                    }
+                }
+            } else if (y === 0 || y === caveHeight - 1) {
+                // Top or bottom border
+                for (var nbExit = 1; nbExit < caveExits.length; nbExit++) {
+                    if (caveExits[nbExit].x === Math.floor(x / 10) && (caveExits[nbExit].direction === 'top' || caveExits[nbExit].direction === 'bottom') && exitsFound.indexOf(nbExit) === -1) {
+                        exitsFound.push(nbExit);
+
+                        if (true === caveExits[nbExit].linked) {
+                            exitsLinked++;
+                        }
+                    }
+                }
+            }
+
+            // Search complete
+            clonedMap[x][y] = 'searched';
+
+            // Search the neighbours
+            for (var i = -1 ; i < 2; i++) {
+                for (var j = -1; j < 2; j++) {
+                    // Search only the neighbours
+                    if (i !== 0 || j !== 0) {
+                        this.search(x + i, y + j);
+                    }
+                }
+            }
+        },
+        validate: function() {
+            var linkedGoal = 0;
+            var linked = 0;
+
+            // Count the number of exits which must be linked
+            for (nbExit = 0; nbExit < caveExits.length; nbExit++) {
+                if (true === caveExits[nbExit].linked) {
+                    linkedGoal++;
+                }
+            }
+
+            return linkedGoal === exitsLinked;
+        }
+    };
+
+    if (this.exits[0].direction === 'top' || this.exits[0].direction === 'bottom') {
+        xStart = 4;
+        yStart = (getDirection(this.exits[0].direction).y + 1) / 2 * 9;
+    } else {
+        xStart = (getDirection(this.exits[0].direction).x + 1) / 2 * 9;
+        yStart = 4;
+    }
+
+    searchForExits.search(xStart, yStart);
+
+    return searchForExits.validate();
 };

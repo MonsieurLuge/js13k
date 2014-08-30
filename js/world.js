@@ -1,7 +1,7 @@
 /**
  * TODO World description
  */
-function World() {
+function World(seed) {
     this.width = null;
     this.height = null;
     this.x = null;
@@ -11,6 +11,7 @@ function World() {
     this.currentCave = null;
     this.maxCaveWidth = 4;
     this.maxCaveHeight = 4;
+    this.seed = seed;
 
     this.init();
 }
@@ -58,8 +59,13 @@ World.prototype.draw = function() {
                 continue;
             }
 
+            if (this.caves[this.currentCave].map[i][j] === 'searched') {
+                context.fillStyle = 'red';
+            } else {
+                context.fillStyle = "#bcbcbc";
+            }
+
             context.beginPath();
-            context.fillStyle = "#bcbcbc";
             context.rect(8 * i, 8 * j, 8, 8);
             context.fill();
         }
@@ -116,6 +122,8 @@ World.prototype.init = function() {
     var caveId = 0;
     this.caves[0] = new Cave({
         id: caveId,
+        // seed: this.seed,
+        seed: this.seed,
         type: 'underground',
         x: 0,
         y: 0,
