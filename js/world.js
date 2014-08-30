@@ -60,7 +60,7 @@ World.prototype.draw = function() {
             }
 
             if (this.caves[this.currentCave].map[i][j] === 'searched') {
-                context.fillStyle = 'red';
+                context.fillStyle = '#6e9e65';
             } else {
                 context.fillStyle = "#bcbcbc";
             }

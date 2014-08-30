@@ -76,10 +76,11 @@ Cave.prototype.clear = function() {
  * @return {[type]} [description]
  */
 Cave.prototype.createCave = function(tries, exits) {
-    if (tries >= 50) {
-        'Abandon de la génération.'
+    // If the maximum of tries is reached, stop the creation and keep the last cave
+    if (tries >= 20) {
+        'Abandon de la génération. On garde la dernière version de la cave.'
 
-        return null;
+        return this;
     }
 
     // Init the seed
@@ -100,13 +101,13 @@ Cave.prototype.createCave = function(tries, exits) {
     // Generate the cave
     this.generate();
 
-    // If the cave is not correctly generated, try again
+    // If the cave is not correctly generated, try again with the next seed
     if (false === this.isValid()) {
         console.log('Fin de la vérification. La cave n\'est pas valide.');
 
-        tries++;
         this.seed++;
-        this.createCave(tries, exits);
+
+        this.createCave(++tries, exits);
     } else {
         console.log('Fin de la vérification. La cave est valide.');
     }
