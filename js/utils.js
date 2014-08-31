@@ -77,6 +77,36 @@ function getDirection(directionId) {
 }
 
 /**
+ * [cellularAutomaton description]
+ * @param  {[type]} map        [description]
+ * @param  {[type]} parameters [description]
+ * @return {[type]}            [description]
+ */
+function cellularAutomaton(map, parameters) {
+    for (var generation = 1; generation <= parameters.generations; generation++) {
+        var clonedMap = map.slice(0);
+
+        for (var i = 0; i < map.length; i++) {
+            for (var j = 0; j < map[0].length; j++) {
+                var neighbours = neighbourCells(clonedMap, i, j);
+
+                if (clonedMap[i][j] === true) {
+                    if (neighbours.deadCells > parameters.cellsToDie) {
+                        map[i][j] = false;
+                    }
+                } else {
+                    if (neighbours.aliveCells > parameters.cellsToLive) {
+                        map[i][j] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return map;
+}
+
+/**
  * TODO neighbourCells description
  *
  * @param  {array} data

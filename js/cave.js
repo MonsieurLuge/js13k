@@ -14,14 +14,6 @@ function Cave(parameters) {
     this.map = [];
     this.exits = [];
 
-    // Cave generator settings
-    this.caveGenerator = {
-        chanceToStartAlive: 0.38,
-        loops: 3,
-        cellsToDie: 5,
-        cellsToLive: 4
-    };
-
     // Init the Cave
     this.init(parameters);
 
@@ -99,7 +91,7 @@ Cave.prototype.createCave = function(tries, exits) {
     }
 
     // Generate the cave
-    this.generate();
+    this.map = cellularAutomaton(this.map, {generations: 3, chanceToStartAlive: 0.38, cellsToDie: 5, cellsToLive: 4});
 
     // If the cave is not correctly generated, try again with the next seed
     if (false === this.isValid()) {
@@ -134,6 +126,8 @@ Cave.prototype.exitExists = function(x, y, direction) {
  * @return {Cave}
  */
 Cave.prototype.fill = function() {
+    var chanceToStartAlive = 0.38;
+
     for (var i = 0; i < this.width; i++) {
         this.map[i] = [];
 
@@ -144,7 +138,7 @@ Cave.prototype.fill = function() {
                         // Draw a border
                         this.map[i][j] = true;
                     } else {
-                        this.map[i][j] = (j >= this.height * 0.8) || (Math.seededRandom(0, 1) <= (this.caveGenerator.chanceToStartAlive * j / this.height));
+                        this.map[i][j] = (j >= this.height * 0.8) || (Math.seededRandom(0, 1) <= (chanceToStartAlive * j / this.height));
                     }
 
                     break;
@@ -154,37 +148,8 @@ Cave.prototype.fill = function() {
                         this.map[i][j] = true;
                     } else {
                         // Or create random content
-                        this.map[i][j] = (Math.seededRandom(0, 1) < this.caveGenerator.chanceToStartAlive);
+                        this.map[i][j] = (Math.seededRandom(0, 1) < chanceToStartAlive);
                     }
-            }
-        }
-    }
-
-    return this;
-};
-
-/**
- * TODO generate description
- *
- * @return {Cave}
- */
-Cave.prototype.generate = function() {
-    for (var generation = 1; generation <= this.caveGenerator.loops; generation++) {
-        var clonedMap = this.map.slice(0);
-
-        for (var i = 0; i < this.width; i++) {
-            for (var j = 0; j < this.height; j++) {
-                var neighbours = neighbourCells(clonedMap, i, j);
-
-                if (clonedMap[i][j] === true) {
-                    if (neighbours.deadCells > this.caveGenerator.cellsToDie) {
-                        this.map[i][j] = false;
-                    }
-                } else {
-                    if (neighbours.aliveCells > this.caveGenerator.cellsToLive) {
-                        this.map[i][j] = true;
-                    }
-                }
             }
         }
     }
