@@ -118,32 +118,30 @@ World.prototype.init = function() {
     this.height = 5;
     this.map = [[]];
 
-    // Create the starting room
-    var caveId = 0;
+    // Create the starting cave
     this.caves[0] = new Cave({
-        id: caveId,
-        // seed: this.seed,
+        id: 0,
         seed: this.seed,
         type: 'underground',
         x: 0,
         y: 0,
-        width: 5,
-        height: 5,
+        width: 4,
+        height: 2,
         exits: [
             {
-                x: 0,
+                x: 2,
                 y: 0,
                 direction: 'top',
                 linked: true
             },
             {
-                x: 4,
+                x: 3,
                 y: 1,
                 direction: 'right'
             },
             {
-                x: 3,
-                y: 4,
+                x: 1,
+                y: 1,
                 direction: 'bottom',
                 linked: true
             }
@@ -151,7 +149,7 @@ World.prototype.init = function() {
     });
 
     // Store the first cave id
-    this.map[0][0] = caveId;
+    this.map[0][0] = 0;
 
     // Then, store the current cave
     this.currentCave = 0;
