@@ -16,6 +16,40 @@ Math.seededRandom = function(min, max) {
 };
 
 /**
+ * Use a cellular automaton to create caves
+ * @param  {Array} map          The map to use
+ * @param  {Object} parameters  {generations, cellsToDie, cellsToLive}
+ * @return {Array}              The map after some generations
+ */
+function cellularAutomaton(map, parameters) {
+    for (var generation = 1; generation <= parameters.generations; generation++) {
+        var clonedMap = map.slice(0);
+
+        for (var i = 0; i < map.length; i++) {
+            for (var j = 0; j < map[0].length; j++) {
+                var neighbours = neighbourCells(clonedMap, i, j);
+
+                if (clonedMap[i][j] === true) {
+                    if (true === parameters.bordersMatters && (neighbours.deadCells > parameters.cellsToDie || neighbours.aliveCells <= 1)) {
+                        map[i][j] = false;
+                    } else  if (neighbours.deadCells > parameters.cellsToDie) {
+                        map[i][j] = false;
+                    }
+                } else {
+                    if (true === parameters.bordersMatters && (neighbours.aliveCells > parameters.cellsToLive || neighbours.deadCells <= 1)) {
+                        map[i][j] = true;
+                    } else if (neighbours.aliveCells > parameters.cellsToLive) {
+                        map[i][j] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return map;
+}
+
+/**
  * Clears the canvas
  *
  * @return {nothing}
@@ -77,36 +111,6 @@ function getDirection(directionId) {
 }
 
 /**
- * [cellularAutomaton description]
- * @param  {[type]} map        [description]
- * @param  {[type]} parameters [description]
- * @return {[type]}            [description]
- */
-function cellularAutomaton(map, parameters) {
-    for (var generation = 1; generation <= parameters.generations; generation++) {
-        var clonedMap = map.slice(0);
-
-        for (var i = 0; i < map.length; i++) {
-            for (var j = 0; j < map[0].length; j++) {
-                var neighbours = neighbourCells(clonedMap, i, j);
-
-                if (clonedMap[i][j] === true) {
-                    if (neighbours.deadCells > parameters.cellsToDie) {
-                        map[i][j] = false;
-                    }
-                } else {
-                    if (neighbours.aliveCells > parameters.cellsToLive) {
-                        map[i][j] = true;
-                    }
-                }
-            }
-        }
-    }
-
-    return map;
-}
-
-/**
  * TODO neighbourCells description
  *
  * @param  {array} data
@@ -118,7 +122,8 @@ function neighbourCells(data, cellX, cellY) {
     var result = {
         deadCells: 0,
         aliveCells: 0,
-        borders: 0
+        borders: 0,
+        neighbours: []
     };
 
     for (var i = -1; i < 2; i++) {
@@ -127,19 +132,24 @@ function neighbourCells(data, cellX, cellY) {
             var neighbourY = cellY + j;
 
             if (i === 0 && j === 0) {
+                result.neighbours[i + 1 + 3 * (j + 1)] = false;
+
                 continue;
             }
 
             if (neighbourX < 0 || neighbourX >= data.length || neighbourY < 0 || neighbourY >= data[0].length) {
                 result.borders++;
+                result.neighbours[i + 1 + 3 * (j + 1)] = true;
 
                 continue;
             }
 
             if (data[neighbourX][neighbourY] === true) {
                 result.aliveCells++;
+                result.neighbours[i + 1 + 3 * (j + 1)] = true;
             } else {
                 result.deadCells++;
+                result.neighbours[i + 1 + 3 * (j + 1)] = false;
             }
         }
     }

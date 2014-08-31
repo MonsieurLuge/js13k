@@ -8,6 +8,7 @@ function World(seed) {
     this.y = null;
     this.map = [];
     this.caves = [];
+    this.caveWalls = [];
     this.currentCave = null;
     this.maxCaveWidth = 4;
     this.maxCaveHeight = 4;
@@ -44,8 +45,47 @@ World.prototype.caveExists = function(x, y) {
  */
 World.prototype.createCave = function(x, y) {
     console.log('create a cave at ' + x + ',' + y);
+    // TODO
 
+};
 
+/**
+ * [createCaveWalls description]
+ * @return {[type]} [description]
+ */
+World.prototype.createCaveWalls = function() {
+    for (var n = 0; n < 256; n++) {
+        var caveWall = {
+            width: 8,
+            height: 8,
+            map: [],
+            generate: function() {
+                var generatedMap = [];
+                var chanceToStartAlive = 0.38;
+
+                // Fill the map with some noise
+                for (var i = 0; i < this.width; i++) {
+                    generatedMap[i] = [];
+
+                    for (var j = 0; j < this.height; j++) {
+                        generatedMap[i][j] = (Math.seededRandom(0, 1) < chanceToStartAlive);
+                    }
+                }
+
+                // Draw the borders
+                // TODO
+
+                // Run the cellular automaton
+                this.map = cellularAutomaton(generatedMap, {generations: 7, cellsToDie: 5, cellsToLive: 4, bordersMatters: true});
+            }
+        }
+
+        // Generate the wave call
+        caveWall.generate();
+
+        // Store the generated cave wall
+        this.caveWalls[n] = caveWall;
+    }
 };
 
 /**
@@ -55,19 +95,37 @@ World.prototype.createCave = function(x, y) {
 World.prototype.draw = function() {
     for (var i = 0; i < this.caves[this.currentCave].width; i++) {
         for (var j = 0; j < this.caves[this.currentCave].height; j++) {
-            if (this.caves[this.currentCave].map[i][j] === false) {
-                continue;
-            }
-
-            if (this.caves[this.currentCave].map[i][j] === 'searched') {
-                context.fillStyle = '#6e9e65';
+            if (true === this.caves[this.currentCave].map[i][j]) {
+                 context.fillStyle = '#aa8978';
             } else {
-                context.fillStyle = "#bcbcbc";
+                context.fillStyle = "#393939";
             }
 
             context.beginPath();
             context.rect(8 * i, 8 * j, 8, 8);
             context.fill();
+        }
+    }
+};
+
+/**
+ * [drawCaveWalls description]
+ * @return {[type]} [description]
+ */
+World.prototype.drawCaveWalls = function() {
+    for (n = 0; n < this.caveWalls.length; n++) {
+        for (var i = 0; i < this.caveWalls[n].width; i++) {
+            for (var j = 0; j < this.caveWalls[n].height; j++) {
+                if (true === this.caveWalls[n].map[i][j]) {
+                    context.fillStyle = "#aa8978";
+                } else {
+                    context.fillStyle = "#393939";
+                }
+
+                context.beginPath();
+                context.rect((4 * i) + this.caveWalls[n].width * 5 * (n % 19), (4 * j) + this.caveWalls[n].height * 5 * (Math.floor(n / 19)), 4, 4);
+                context.fill();
+            }
         }
     }
 };
@@ -111,12 +169,18 @@ World.prototype.init = function() {
     // Delete all explored caves
     this.caves = [];
 
+    // Delete all cave walls
+    this.caveWalls = [];
+
     // Init some things
     this.x = 0;
     this.y = 0;
     this.width = 5;
     this.height = 5;
     this.map = [[]];
+
+    // Create the cave walls
+    this.createCaveWalls();
 
     // Create the starting cave
     this.caves[0] = new Cave({
