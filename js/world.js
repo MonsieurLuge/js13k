@@ -55,36 +55,9 @@ World.prototype.createCave = function(x, y) {
  */
 World.prototype.createCaveWalls = function() {
     for (var n = 0; n < 256; n++) {
-        var caveWall = {
-            width: 8,
-            height: 8,
-            map: [],
-            generate: function() {
-                var generatedMap = [];
-                var chanceToStartAlive = 0.38;
+        this.caveWalls[n] = new CaveWall(n);
 
-                // Fill the map with some noise
-                for (var i = 0; i < this.width; i++) {
-                    generatedMap[i] = [];
-
-                    for (var j = 0; j < this.height; j++) {
-                        generatedMap[i][j] = (Math.seededRandom(0, 1) < chanceToStartAlive);
-                    }
-                }
-
-                // Draw the borders
-                // TODO
-
-                // Run the cellular automaton
-                this.map = cellularAutomaton(generatedMap, {generations: 7, cellsToDie: 5, cellsToLive: 4, bordersMatters: true});
-            }
-        }
-
-        // Generate the wave call
-        caveWall.generate();
-
-        // Store the generated cave wall
-        this.caveWalls[n] = caveWall;
+        this.caveWalls[n].generate();
     }
 };
 
@@ -113,7 +86,7 @@ World.prototype.draw = function() {
  * @return {[type]} [description]
  */
 World.prototype.drawCaveWalls = function() {
-    for (n = 0; n < this.caveWalls.length; n++) {
+    for (var n = 0; n < this.caveWalls.length; n++) {
         for (var i = 0; i < this.caveWalls[n].width; i++) {
             for (var j = 0; j < this.caveWalls[n].height; j++) {
                 if (true === this.caveWalls[n].map[i][j]) {

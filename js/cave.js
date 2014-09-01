@@ -195,7 +195,7 @@ Cave.prototype.getExit = function(x, y) {
     }
 
     return null;
-}
+};
 
 /**
  * Returns the exits at these room coordinates
@@ -257,7 +257,7 @@ Cave.prototype.isValid = function() {
     var self = this;
     var clonedMap = this.map.slice(0);
     var exitsLinked = 0;
-    var exitsFound = []
+    var exitsFound = [];
 
     var searchForExits = {
         // Check for an exit, store it, and increase linked count
@@ -323,10 +323,9 @@ Cave.prototype.isValid = function() {
         // Count the number of linked exits
         validate: function() {
             var linkedGoal = 0;
-            var linked = 0;
 
             // Count the number of exits which must be linked
-            for (n = 0; n < self.exits.length; n++) {
+            for (var n = 0; n < self.exits.length; n++) {
                 if (true === self.exits[n].linked) {
                     linkedGoal++;
                 }
