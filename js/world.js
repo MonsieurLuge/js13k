@@ -66,16 +66,16 @@ World.prototype.createCaveWalls = function() {
  * @return {[type]} [description]
  */
 World.prototype.draw = function() {
-    for (var i = 0; i < this.caves[this.currentCave].width; i++) {
-        for (var j = 0; j < this.caves[this.currentCave].height; j++) {
+    for (var i = 0; i < this.caves[this.currentCave].width * 8; i++) {
+        for (var j = 0; j < this.caves[this.currentCave].height * 8; j++) {
             if (true === this.caves[this.currentCave].map[i][j]) {
-                 context.fillStyle = '#aa8978';
+                context.fillStyle = '#aa8978';
             } else {
                 context.fillStyle = "#393939";
             }
 
             context.beginPath();
-            context.rect(8 * i, 8 * j, 8, 8);
+            context.rect(2 * i, 2 * j, 2, 2);
             context.fill();
         }
     }

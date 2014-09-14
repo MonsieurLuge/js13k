@@ -55,6 +55,10 @@ Cave.prototype.addExit = function(parameters) {
     this.exits.push(parameters);
 };
 
+Cave.applyCaveWalls = function() {
+    //TODO
+};
+
 /**
  * TODO clear description
  * @return {[type]} [description]
