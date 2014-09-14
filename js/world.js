@@ -8,7 +8,6 @@ function World(seed) {
     this.y = null;
     this.map = [];
     this.caves = [];
-    this.caveWalls = [];
     this.currentCave = null;
     this.maxCaveWidth = 4;
     this.maxCaveHeight = 4;
@@ -50,18 +49,6 @@ World.prototype.createCave = function(x, y) {
 };
 
 /**
- * [createCaveWalls description]
- * @return {[type]} [description]
- */
-World.prototype.createCaveWalls = function() {
-    for (var n = 0; n < 256; n++) {
-        this.caveWalls[n] = new CaveWall(n);
-
-        this.caveWalls[n].generate();
-    }
-};
-
-/**
  * TODO draw description
  * @return {[type]} [description]
  */
@@ -82,21 +69,21 @@ World.prototype.draw = function() {
 };
 
 /**
- * [drawCaveWalls description]
+ * TODO remove, for test purpose
  * @return {[type]} [description]
  */
 World.prototype.drawCaveWalls = function() {
-    for (var n = 0; n < this.caveWalls.length; n++) {
-        for (var i = 0; i < this.caveWalls[n].width; i++) {
-            for (var j = 0; j < this.caveWalls[n].height; j++) {
-                if (true === this.caveWalls[n].map[i][j]) {
+    for (var n = 0; n < 256; n++) {
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                if (true === this.caves[this.currentCave].getCaveWall(n).map[i][j]) {
                     context.fillStyle = "#aa8978";
                 } else {
                     context.fillStyle = "#393939";
                 }
 
                 context.beginPath();
-                context.rect((4 * i) + this.caveWalls[n].width * 5 * (n % 19), (4 * j) + this.caveWalls[n].height * 5 * (Math.floor(n / 19)), 4, 4);
+                context.rect((4 * i) + 40 * (n % 19), (4 * j) + 40 * (Math.floor(n / 19)), 4, 4);
                 context.fill();
             }
         }
@@ -142,18 +129,12 @@ World.prototype.init = function() {
     // Delete all explored caves
     this.caves = [];
 
-    // Delete all cave walls
-    this.caveWalls = [];
-
     // Init some things
     this.x = 0;
     this.y = 0;
     this.width = 5;
     this.height = 5;
     this.map = [[]];
-
-    // Create the cave walls
-    this.createCaveWalls();
 
     // Create the starting cave
     this.caves[0] = new Cave({

@@ -22,6 +22,11 @@ function Cave(parameters) {
 }
 
 /**
+ * Static variables
+ */
+Cave.caveWalls = null;
+
+/**
  * TODO addExit description
  * @param {Object} parameters
  */
@@ -110,6 +115,20 @@ Cave.prototype.createCave = function(tries, exits) {
 };
 
 /**
+ * [createCaveWalls description]
+ * @return {[type]} [description]
+ */
+Cave.prototype.createCaveWalls = function() {
+    Cave.caveWalls = [];
+
+    for (var n = 0; n < 256; n++) {
+        Cave.caveWalls[n] = new CaveWall(n);
+
+        Cave.caveWalls[n].generate();
+    }
+};
+
+/**
  * Tells if an exit exits at these coordinates, to this direction
  *
  * @return {boolean}
@@ -159,6 +178,14 @@ Cave.prototype.fill = function() {
     }
 
     return this;
+};
+
+/**
+ * [getCaveWall description]
+ * @type {[type]}
+ */
+Cave.prototype.getCaveWall = function(num) {
+    return Cave.caveWalls[num];
 };
 
 /**
@@ -230,6 +257,11 @@ Cave.prototype.init = function(parameters) {
     this.caveId = parameters.id;
     this.type = parameters.type;
     this.seed = parameters.seed;
+
+    // Create and generate the cave walls
+    if (Cave.caveWalls === null) {
+        this.createCaveWalls();
+    }
 
     // Coordinates of the first room of the cave
     this.x = parameters.x;

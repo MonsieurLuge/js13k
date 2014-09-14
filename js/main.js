@@ -44,11 +44,8 @@ function startGame(seed) {
     //world.explore();
 
     // Draw the world
-    world.draw();
-
-    // Draw the cave walls
-    // TODO remove, for test purpose
-    //world.drawCaveWalls();
+    //world.draw();
+    world.drawCaveWalls();
 
     // TODO
     //gameLoop();
