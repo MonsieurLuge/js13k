@@ -35,7 +35,7 @@ function startGame(seed) {
 
     // For test purpose
     clearScreen();
-    //drawGrid();
+    drawGrid();
 
     // Create the world
     world = new World(seed);
@@ -44,8 +44,8 @@ function startGame(seed) {
     //world.explore();
 
     // Draw the world
-    //world.draw();
-    world.drawCaveWalls();
+    world.draw();
+    //world.drawCaveWalls();
 
     // TODO
     //gameLoop();

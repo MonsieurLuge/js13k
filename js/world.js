@@ -53,9 +53,9 @@ World.prototype.createCave = function(x, y) {
  * @return {[type]} [description]
  */
 World.prototype.draw = function() {
-    for (var i = 0; i < this.caves[this.currentCave].width * 8; i++) {
-        for (var j = 0; j < this.caves[this.currentCave].height * 8; j++) {
-            if (true === this.caves[this.currentCave].map[i][j]) {
+    for (var i = 0; i < this.caves[this.currentCave].width; i++) {
+        for (var j = 0; j < this.caves[this.currentCave].height; j++) {
+            if (this.caves[this.currentCave].map[i][j] === 1) {
                 context.fillStyle = '#aa8978';
             } else {
                 context.fillStyle = "#393939";

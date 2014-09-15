@@ -60,8 +60,38 @@ Cave.prototype.addExit = function(parameters) {
     this.exits.push(parameters);
 };
 
-Cave.applyCaveWalls = function() {
-    //TODO
+/**
+ * TODO applyCaveWalls description
+ * @return {[type]} [description]
+ */
+Cave.prototype.applyCaveWalls = function() {
+    var caveTemp = [];
+
+    // Parse every cell of the current map
+    for (var i = 0; i < this.width; i++) {
+        for (var j = 0; j < this.height; j++) {
+            for (var x = 0; x < 8; x++) {
+                caveTemp[x + 8 * i] = [];
+                for (var y = 0; y < 8; y++) {
+                    if (this.map[i][j] === true) {
+                        caveTemp[x + 8 * i][y + 8 * j] = 1;
+                    } else {
+                        var neighbours = neighbourCells(this.map, i, j);
+
+                        // Get the right cave wall
+                        // TODO
+
+                        caveTemp[x + 8 * i][y + 8 * j] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    // Store the new map
+    this.width = this.width * 8;
+    this.height = this.height * 8;
+    this.cave = caveTemp.slice(0);
 };
 
 /**
@@ -110,6 +140,9 @@ Cave.prototype.createCave = function(tries, exits) {
     } else {
         console.log('Cave creation complete. Tries = ', tries);
     }
+
+    // Apply the cave walls
+    this.applyCaveWalls();
 
     return this;
 };
