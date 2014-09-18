@@ -45,7 +45,6 @@ function startGame(seed) {
 
     // Draw the world
     world.draw();
-    //world.drawCaveWalls();
 
     // TODO
     //gameLoop();

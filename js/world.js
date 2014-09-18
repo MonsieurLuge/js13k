@@ -55,7 +55,7 @@ World.prototype.createCave = function(x, y) {
 World.prototype.draw = function() {
     for (var i = 0; i < this.caves[this.currentCave].width; i++) {
         for (var j = 0; j < this.caves[this.currentCave].height; j++) {
-            if (this.caves[this.currentCave].map[i][j] === 1) {
+            if (this.caves[this.currentCave].map[i][j] === true) {
                 context.fillStyle = '#aa8978';
             } else {
                 context.fillStyle = "#393939";
@@ -64,28 +64,6 @@ World.prototype.draw = function() {
             context.beginPath();
             context.rect(2 * i, 2 * j, 2, 2);
             context.fill();
-        }
-    }
-};
-
-/**
- * TODO remove, for test purpose
- * @return {[type]} [description]
- */
-World.prototype.drawCaveWalls = function() {
-    for (var n = 0; n < 256; n++) {
-        for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < 8; j++) {
-                if (true === this.caves[this.currentCave].getCaveWall(n).map[i][j]) {
-                    context.fillStyle = "#aa8978";
-                } else {
-                    context.fillStyle = "#393939";
-                }
-
-                context.beginPath();
-                context.rect((4 * i) + 40 * (n % 19), (4 * j) + 40 * (Math.floor(n / 19)), 4, 4);
-                context.fill();
-            }
         }
     }
 };

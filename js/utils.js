@@ -123,7 +123,7 @@ function neighbourCells(data, cellX, cellY) {
         deadCells: 0,
         aliveCells: 0,
         borders: 0,
-        neighbours: []
+        neighbours: [],
     };
 
     for (var i = -1; i < 2; i++) {

@@ -22,11 +22,6 @@ function Cave(parameters) {
 }
 
 /**
- * Static variables
- */
-Cave.caveWalls = null;
-
-/**
  * TODO addExit description
  * @param {Object} parameters
  */
@@ -58,40 +53,6 @@ Cave.prototype.addExit = function(parameters) {
 
     // Store the exit informations
     this.exits.push(parameters);
-};
-
-/**
- * TODO applyCaveWalls description
- * @return {[type]} [description]
- */
-Cave.prototype.applyCaveWalls = function() {
-    var caveTemp = [];
-
-    // Parse every cell of the current map
-    for (var i = 0; i < this.width; i++) {
-        for (var j = 0; j < this.height; j++) {
-            for (var x = 0; x < 8; x++) {
-                caveTemp[x + 8 * i] = [];
-                for (var y = 0; y < 8; y++) {
-                    if (this.map[i][j] === true) {
-                        caveTemp[x + 8 * i][y + 8 * j] = 1;
-                    } else {
-                        var neighbours = neighbourCells(this.map, i, j);
-
-                        // Get the right cave wall
-                        // TODO
-
-                        caveTemp[x + 8 * i][y + 8 * j] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    // Store the new map
-    this.width = this.width * 8;
-    this.height = this.height * 8;
-    this.cave = caveTemp.slice(0);
 };
 
 /**
@@ -141,24 +102,22 @@ Cave.prototype.createCave = function(tries, exits) {
         console.log('Cave creation complete. Tries = ', tries);
     }
 
-    // Apply the cave walls
-    this.applyCaveWalls();
+    // Expand the cave
+    this.expand();
+
+    // Fill it again with random values
+    for (var x = 0; x < this.width; x++) {
+        for (var y = 0; y < this.height; y++) {
+            if (Math.seededRandom(0, 1) < 0.45) {
+                this.map[x][y] = true;
+            }
+        }
+    }
+
+    // Then, use the cellular automaton
+    this.map = cellularAutomaton(this.map, {generations: 3, cellsToDie: 4, cellsToLive: 5});
 
     return this;
-};
-
-/**
- * [createCaveWalls description]
- * @return {[type]} [description]
- */
-Cave.prototype.createCaveWalls = function() {
-    Cave.caveWalls = [];
-
-    for (var n = 0; n < 256; n++) {
-        Cave.caveWalls[n] = new CaveWall(n);
-
-        Cave.caveWalls[n].generate();
-    }
 };
 
 /**
@@ -174,6 +133,34 @@ Cave.prototype.exitExists = function(x, y, direction) {
     }
 
     return false;
+};
+
+/**
+ * TODO expand description
+ * @return {[type]} [description]
+ */
+Cave.prototype.expand = function() {
+    var caveTemp = [];
+
+    // Parse every cell of the current map
+    for (var j = 0; j < this.height; j++) {
+        for (var i = 0; i < this.width; i++) {
+            for (var x = 0; x < 8; x++) {
+                for (var y = 0; y < 8; y++) {
+                    if (j === 0 && y === 0) {
+                        caveTemp[x + 8 * i] = [];
+                    }
+
+                    caveTemp[x + 8 * i][y + 8 * j] = this.map[i][j];
+                }
+            }
+        }
+    }
+
+    // Update the map
+    this.width = this.width * 8;
+    this.height = this.height * 8;
+    this.map = caveTemp.slice(0);
 };
 
 /**
@@ -211,14 +198,6 @@ Cave.prototype.fill = function() {
     }
 
     return this;
-};
-
-/**
- * [getCaveWall description]
- * @type {[type]}
- */
-Cave.prototype.getCaveWall = function(num) {
-    return Cave.caveWalls[num];
 };
 
 /**
@@ -291,12 +270,7 @@ Cave.prototype.init = function(parameters) {
     this.type = parameters.type;
     this.seed = parameters.seed;
 
-    // Create and generate the cave walls
-    if (Cave.caveWalls === null) {
-        this.createCaveWalls();
-    }
-
-    // Coordinates of the first room of the cave
+    // Coordinates of the top left "room" of the cave
     this.x = parameters.x;
     this.y = parameters.y;
 
