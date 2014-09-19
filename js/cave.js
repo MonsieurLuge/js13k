@@ -99,23 +99,23 @@ Cave.prototype.createCave = function(tries, exits) {
 
         this.createCave(++tries, exits);
     } else {
-        console.log('Cave creation complete. Tries = ', tries);
-    }
+        // Expand the cave
+        this.expand();
 
-    // Expand the cave
-    this.expand();
-
-    // Fill it again with random values
-    for (var x = 0; x < this.width; x++) {
-        for (var y = 0; y < this.height; y++) {
-            if (Math.seededRandom(0, 1) < 0.45) {
-                this.map[x][y] = true;
+        // Fill it again with random values
+        for (var x = 0; x < this.width; x++) {
+            for (var y = 0; y < this.height; y++) {
+                if (Math.seededRandom(0, 1) < 0.45) {
+                    this.map[x][y] = true;
+                }
             }
         }
-    }
 
-    // Then, use the cellular automaton
-    this.map = cellularAutomaton(this.map, {generations: 3, cellsToDie: 4, cellsToLive: 5});
+        // Then, use the cellular automaton
+        this.map = cellularAutomaton(this.map, {generations: 3, cellsToDie: 4, cellsToLive: 5});
+
+        console.log('Cave creation complete. Tries = ', tries);
+    }
 
     return this;
 };
