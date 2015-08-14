@@ -65,7 +65,7 @@ function clearScreen() {
  * @return {nothing}
  */
 function drawGrid() {
-    var roomSize = 10;
+    var roomSize = 20;
 
     context.strokeStyle = "#414141";
     context.lineWidth = 2;

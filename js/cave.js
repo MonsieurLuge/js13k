@@ -99,13 +99,13 @@ Cave.prototype.createCave = function(tries, exits) {
 
         this.createCave(++tries, exits);
     } else {
-        // Expand the cave
+        // Expand the cave size
         this.expand();
 
         // Fill it again with random values
         for (var x = 0; x < this.width; x++) {
             for (var y = 0; y < this.height; y++) {
-                if (Math.seededRandom(0, 1) < 0.45) {
+                if (Math.seededRandom(0, 1) < 0.50) {
                     this.map[x][y] = true;
                 }
             }

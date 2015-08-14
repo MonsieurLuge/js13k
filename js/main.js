@@ -5,11 +5,11 @@
  * @author: Monsieur Luge
  */
 
-var canvas = document.getElementById("js13k-2014");
-var context = canvas.getContext('2d');
+var canvas    = document.getElementById("js13k-2014");
+var context   = canvas.getContext('2d');
 var frameRate = 1000/60;
-var seed = null;
-var world = null;
+var seed      = null;
+var world     = null;
 
 /**
  * TODO gameLoop description

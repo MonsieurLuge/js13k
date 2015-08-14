@@ -12,7 +12,7 @@
     </head>
 
     <body>
-        <p id="game-infos">Game seed : <span id="game-seed"></span></p>
+        <p id="game-infos" onclick="newRandomWorld()">Game seed : <span id="game-seed"></span></p>
         <canvas id="js13k-2014" width="800" height="600"></canvas>
 
         <script src="js/utils.js"></script>
@@ -21,4 +21,14 @@
         <script src="js/cave.js"></script>
         <script src="js/main.js"></script>
     </body>
+    
+    <script language="javascript">
+      function newRandomWorld() {
+        var seed = Math.round(Math.random() * 32000);
+        
+        document.getElementById('game-seed').innerHTML = seed;
+        
+        startGame(seed);
+      }
+    </script>
 </html>

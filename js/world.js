@@ -31,10 +31,6 @@ World.prototype.caveExists = function(x, y) {
         return false;
     }
 
-    if (this.map[x][y] === undefined) {
-        return false;
-    }
-
     // If there is a cave Id at these coordinates, return true
     return this.map[x][y] !== undefined;
 };
@@ -121,24 +117,25 @@ World.prototype.init = function() {
         type: 'underground',
         x: 0,
         y: 0,
-        width: 4,
+        width: 2,
         height: 2,
         exits: [
             {
-                x: 2,
+                x: 0,
                 y: 0,
                 direction: 'top',
                 linked: true
             },
             {
-                x: 3,
-                y: 1,
-                direction: 'right'
-            },
-            {
                 x: 1,
                 y: 1,
                 direction: 'bottom',
+                linked: true
+            },
+            {
+                x: 0,
+                y: 1,
+                direction: 'left',
                 linked: true
             }
         ]
